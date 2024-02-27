@@ -1,10 +1,19 @@
-const User = require('../models/users');
-const Stores = require('../models/stores');
+const User = require('../../models/users');
+const Stores = require('../../models/stores');
+const sequelize = require('../../database/sequelize');
 const express = require('express');
 const app = express();
 
 app.use(express.json());
 const storesRouter = express.Router()
+
+sequelize.sync({force: false})
+    .then(() => {
+        console.log('Tabelas sincronizadas com o banco de dados.');
+    })
+    .catch((error) => {
+        console.log('Erro ao sincronizar tabelas', error);
+    });
 
 storesRouter.get('/stores', async(req, res) => {
     try{
@@ -32,7 +41,7 @@ storesRouter.get('/store/:id', async(req, res) => {
 
 storesRouter.post('/register_store', async(req, res) => {
     try{
-        const { name, owners, phone, street, number } = req.body;
+        const { name, owners, phone, street, number, delivery, minimum_delivery, maximum_delivery } = req.body;
         const existingUsers = await User.findAll({ where: { id: owners } });
 
         if (!owners || owners.length === 0) {
@@ -43,11 +52,11 @@ storesRouter.post('/register_store', async(req, res) => {
             return res.status(404).json({ 'message': 'Um ou mais usuários não foram encontrados' });
         }
 
-        await Stores.create({ name, owners, phone, street, number });
+        await Stores.create({ name, owners, phone, street, number, delivery, minimum_delivery, maximum_delivery });
         return res.status(200).json({'message': 'Loja criada com sucesso'})
     }catch(error){
         console.log(error);
-        return res.status(500).json({'message': 'Erro ao listar lojas!'});
+        return res.status(500).json({'message': 'Erro ao criar loja!'});
     }
 });
 

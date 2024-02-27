@@ -1,5 +1,5 @@
-const User = require('../models/users')
-const sequelize = require('../database/sequelize');
+const User = require('../../models/users')
+const sequelize = require('../../database/sequelize');
 const express = require('express');
 const app = express();
 app.use(express.json());
@@ -43,10 +43,6 @@ sequelize.sync({force: false})
 
 const usersRouter = express.Router()
 
-usersRouter.get('/', async(req, res) => {
-    res.send('Olá, mundo!');
-});
-
 usersRouter.get('/users', async(req, res) => {
     try{
         const users = await User.findAll();
@@ -59,8 +55,15 @@ usersRouter.get('/users', async(req, res) => {
 
 usersRouter.post('/register_user', async(req, res) => {
     try{
-        const { username, email } = req.body;
-        await User.create({username, email});
+        const { username, email, cpf } = req.body;
+        const cpf_existing = await User.findOne({where: {cpf:cpf}});
+        if(cpf.length > 11){
+            res.status(400).json({'message': 'Cpf inválido!'});
+        }
+        if(cpf_existing){
+            res.status(409).json({'message': 'Cpf indisponível!'})
+        }
+        await User.create({username, email, cpf});
         res.status(200).json({'message': 'Usuário cadastrado com sucesso'});
         }catch(error){
             console.log('Erro ao cadastrar usuário!', error);

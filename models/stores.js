@@ -23,6 +23,18 @@ const Stores = sequelize.define('Stores', {
     number: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    delivery: {
+        type: DataTypes.BOOLEAN,
+        default: false,
+    },
+    minimum_delivery: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    maximum_delivery: {
+        type: DataTypes.INTEGER,
+        allowNull: true
     }
 });
 

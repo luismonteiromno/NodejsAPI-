@@ -11,6 +11,11 @@ const User = sequelize.define('User', {
         allowNull: false,
         unique: true,
     },
+    cpf: {
+        type: DataTypes.STRING(13),
+        allowNull: false,
+        unique: true
+    }
 });
 
 module.exports = User;
