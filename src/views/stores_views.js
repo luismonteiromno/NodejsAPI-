@@ -1,5 +1,5 @@
-const User = require('../../models/users');
-const Stores = require('../../models/stores');
+const User = require('../../models/Users');
+const Stores = require('../../models/Stores');
 const sequelize = require('../../database/sequelize');
 const express = require('express');
 const app = express();
@@ -7,9 +7,9 @@ const app = express();
 app.use(express.json());
 const storesRouter = express.Router()
 
-sequelize.sync({force: false})
+Stores.sequelize.sync({force: false})
     .then(() => {
-        console.log('Tabelas sincronizadas com o banco de dados.');
+        console.log('Tabela Stores sincronizadas com o banco de dados.');
     })
     .catch((error) => {
         console.log('Erro ao sincronizar tabelas', error);

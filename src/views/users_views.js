@@ -1,4 +1,4 @@
-const User = require('../../models/users')
+const User = require('../../models/Users')
 const sequelize = require('../../database/sequelize');
 const express = require('express');
 const app = express();
@@ -7,7 +7,7 @@ app.use(express.json());
 // sincronizar os modelos com o banco de dados não é obrigatória, mas é uma prática comum ao utilizar o Sequelize.
 sequelize.sync({force: false})
     .then(() => {
-        console.log('Tabelas sincronizadas com o banco de dados.');
+        console.log('Tabela User sincronizada com o banco de dados.');
     })
     .catch((error) => {
         console.log('Erro ao sincronizar tabelas', error);
@@ -55,13 +55,17 @@ usersRouter.get('/users', async(req, res) => {
 
 usersRouter.post('/register_user', async(req, res) => {
     try{
-        const { username, email, cpf } = req.body;
+        const {username, email, cpf} = req.body;
         const cpf_existing = await User.findOne({where: {cpf:cpf}});
+        const email_existing = await User.findAll({where: {email:email}})
         if(cpf.length > 11){
             res.status(400).json({'message': 'Cpf inválido!'});
         }
         if(cpf_existing){
             res.status(409).json({'message': 'Cpf indisponível!'})
+        }
+        if(email_existing){
+            res.status(409).json({'message': 'Email indisponível!'})
         }
         await User.create({username, email, cpf});
         res.status(200).json({'message': 'Usuário cadastrado com sucesso'});
@@ -110,7 +114,7 @@ usersRouter.get('/user/:id', async(req, res) => {
         console.log(error)
         return res.status(500).json({'Message': 'Erro ao listar usuário!'});
     }
-})
+});
 
 
 module.exports = usersRouter;
