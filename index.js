@@ -1,17 +1,17 @@
-const users = require('./src/views/users_views');
-const stores = require('./src/views/stores_views');
-const products = require('./src/views/products_views');
 const express = require('express');
+const routers =  require('./routes/routers');
+const sequelize = require('./database/sequelize');
 const app = express();
 const port = 3000;
 
 app.use(express.json());
 
+// sincronizar os modelos com o banco de dados não é obrigatória, mas é uma prática comum ao utilizar o Sequelize.
 app.get('/', async(req, res) => {
     res.send('Olá, mundo!');
 });
-app.use('/users', users);
-app.use('/stores', stores);
-app.use('/products', products);
 
-app.listen(port)
+app.use('/api', routers);
+
+
+app.listen(port);

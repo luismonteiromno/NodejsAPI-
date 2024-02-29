@@ -1,28 +1,28 @@
 const Products = require('../../models/Products');
-const Stores = require('../../models/Stores');
 const sequelize = require('../../database/sequelize');
+const Stores = require('../../models/Stores');
 const express = require('express');
+const { where } = require('sequelize');
 const app = express();
 app.use(express.json());
 
+
+const productsRouter = express.Router();
 sequelize.sync({force: false})
     .then(() => {
-        console.log('Tabela Products sincronizada com o banco de dados.');
+        console.log('Tabela Products sincronizadas com o banco de dados.');
     })
     .catch((error) => {
         console.log('Erro ao sincronizar tabelas', error);
     });
 
-
-const productsRouter = express.Router();
-
 productsRouter.get('/all_products', async(req, res) => {
     try{
         const products = await Products.findAll();
-        res.status(200).json({'message': 'Sucesso', 'products': products});
+        return res.status(200).json({'message': 'Sucesso', 'products': products});
     }catch(error){
         console.log(`error ${error}`)
-        res.status(500).json({'message': 'Erro ao listar produtos!'})
+        return res.status(500).json({'message': 'Erro ao listar produtos!'})
     }
 });
 
@@ -34,11 +34,41 @@ productsRouter.post('/register_product', async(req, res) => {
             return res.status(404).json({'message': 'Alguma(s) loja(s) não foi(ram) encontrada(s)!'})
         }
         await Products.create({name, stores, price, in_stock});
-        res.status(200).json({'message': 'Produto registrado com sucesso'})
+        return res.status(200).json({'message': 'Produto registrado com sucesso'})
     }catch(error){
         console.log(error)
-        res.status(500).json({'message': 'Erro ao registrar produto!'})
+        return res.status(500).json({'message': 'Erro ao registrar produto!'})
     }
 });
+
+productsRouter.patch('/update_product/:id', async(req, res) => {
+    try{
+        const {id} = req.params;
+        const {name, stores, price} = req.body;
+        const product = await Products.findByPk(id);
+        const store = await Stores.findAll({where: {id:stores}});
+        if(stores.length !== store.length){
+            return res.status(404).json({'message': 'Alguma(s) loja(s) não foi(ram) encontrada(s)!'});
+        }
+        product.name = name;
+        product.stores = stores;
+        product.price = price;
+        await product.save();
+        return res.status(200).json({'message': 'Produto atualizado com sucesso'})
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({'message': 'Erro ao atualizar produto!'})
+    }
+});
+
+productsRouter.get('/products_in_stock', async(req, res) => {
+    try{
+        const products = await Products.findAll({where: {in_stock:true}});
+        return res.status(200).json({'message': 'Produtos em estoque', 'products': products});
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({'message': 'Erro ao listar produtos!'})
+    }
+})
 
 module.exports = productsRouter;

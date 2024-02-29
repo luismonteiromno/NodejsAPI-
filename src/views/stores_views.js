@@ -6,8 +6,7 @@ const app = express();
 
 app.use(express.json());
 const storesRouter = express.Router()
-
-Stores.sequelize.sync({force: false})
+sequelize.sync({force: false})
     .then(() => {
         console.log('Tabela Stores sincronizadas com o banco de dados.');
     })
@@ -47,11 +46,17 @@ storesRouter.post('/register_store', async(req, res) => {
         if (!owners || owners.length === 0) {
             return res.status(400).json({ 'message': 'Atributo "owners" é obrigatório' });
         }
-
         if (owners.length !== existingUsers.length) {
             return res.status(404).json({ 'message': 'Um ou mais usuários não foram encontrados' });
         }
-
+        if(delivery === true && (minimum_delivery === null || maximum_delivery === null || minimum_delivery === 0 || maximum_delivery === 0)
+        ){
+            res.status(400).json({'message': 'Preencha os campos de tempo de entrega corretamente!'})
+        }
+        if(delivery === false && (minimum_delivery !== null || maximum_delivery !== null || minimum_delivery !== 0 || maximum_delivery !== 0)
+        ){
+            res.status(400).json({'message': 'Preencha o campo de Delivery para validar os campos de tempo de entrega'})
+        }
         await Stores.create({ name, owners, phone, street, number, delivery, minimum_delivery, maximum_delivery });
         return res.status(200).json({'message': 'Loja criada com sucesso'})
     }catch(error){
@@ -59,6 +64,37 @@ storesRouter.post('/register_store', async(req, res) => {
         return res.status(500).json({'message': 'Erro ao criar loja!'});
     }
 });
+
+storesRouter.patch('/update_store/:id', async(req, res) => {
+    try{
+        const {id} = req.params;
+        const {name, owners, phone, street, number, delivery, minimum_delivery, maximum_delivery} = req.body;
+        const store = await Stores.findByPk(id);
+        if(!store){
+            res.status(404).json({'message': 'Loja não encontrada!'});
+        }
+        if(owners.length !== store.owners.length){
+            const owner = await User.findAll({where: {id:owners}});
+            if(!owner || owner.length !== owners.length){
+                res.status(400).json    ({'message': 'Algum(ns) usuário(s) não foi(ram) encontrado(s)'});
+            }
+        }
+        
+        if(delivery === true && (minimum_delivery === null || maximum_delivery === null || minimum_delivery === 0 || maximum_delivery === 0)
+        ){
+            res.status(400).json({'message': 'Preencha os campos de tempo de entrega corretamente!'})
+        }
+        if(delivery === false && (minimum_delivery !== null || maximum_delivery !== null || minimum_delivery !== 0 || maximum_delivery !== 0)
+        ){
+            res.status(400).json({'message': 'Preencha o campo de Delivery para validar os campos de tempo de entrega'})
+        }
+        await store.update({name, owners, phone, street, number, delivery, minimum_delivery, maximum_delivery})
+        return res.status(200).json({'message': 'Loja atualizada com sucesso'})
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({'message': 'Erro ao atualizar loja!'})
+    }
+})
 
 storesRouter.delete('/exclude_store', async(req, res) => {
     try{
@@ -68,9 +104,10 @@ storesRouter.delete('/exclude_store', async(req, res) => {
             return res.status(404).json({'message': 'Loja não encontrada!'})
         }
         await store.destroy()
-        res.status(200).json({'message': 'Loja deletada com sucesso'})
+        return res.status(200).json({'message': 'Loja deletada com sucesso'})
     }catch(error){
         console.log(error);
+        return res.status(500).json({'message': 'Erro ao excluir loja!'})
     }
 });
 
