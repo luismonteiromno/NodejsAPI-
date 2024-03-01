@@ -29,6 +29,6 @@ Notifications.belongsTo(User, {
         allowNull: false,
         type: DataTypes.INTEGER
     }
-})
+});
 
 module.exports = Notifications;
