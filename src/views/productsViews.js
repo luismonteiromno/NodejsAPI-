@@ -2,7 +2,6 @@ const Products = require('../../models/Products');
 const sequelize = require('../../database/sequelize');
 const Stores = require('../../models/Stores');
 const express = require('express');
-const { where } = require('sequelize');
 const app = express();
 app.use(express.json());
 
@@ -18,7 +17,7 @@ sequelize.sync({force: false})
 
 productsRouter.get('/all_products', async(req, res) => {
     try{
-        const products = await Products.findAll();
+        const products = await Products.findAll({attributes: {exclude:['PurchaseId']}});
         return res.status(200).json({'message': 'Sucesso', 'products': products});
     }catch(error){
         console.log(`error ${error}`)
@@ -63,7 +62,7 @@ productsRouter.patch('/update_product/:id', async(req, res) => {
 
 productsRouter.get('/products_in_stock', async(req, res) => {
     try{
-        const products = await Products.findAll({where: {in_stock:true}});
+        const products = await Products.findAll({where: {in_stock:true}, attributes:{exclude:['PurchaseId']}});
         return res.status(200).json({'message': 'Produtos em estoque', 'products': products});
     }catch(error){
         console.log(error);

@@ -25,7 +25,7 @@ const Notifications = sequelize.define('Notifications', {
 
 Notifications.belongsTo(User, {
     foreignKey: {
-        name: 'user_id',
+        name: 'userId',
         allowNull: false,
         type: DataTypes.INTEGER
     }
