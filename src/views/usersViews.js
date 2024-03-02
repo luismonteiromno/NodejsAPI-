@@ -30,13 +30,13 @@ usersRouter.post('/register_user', async(req, res) => {
         const cpf_existing = await User.findOne({where: {cpf:cpf}});
         const email_existing = await User.findOne({where: {email:email}})
         if(cpf.length > 11){
-            res.status(400).json({'message': 'Cpf inválido!'});
+            return res.status(400).json({'message': 'Cpf inválido!'});
         }
         if(cpf_existing){
-            res.status(409).json({'message': 'Cpf indisponível!'})
+            return res.status(409).json({'message': 'Cpf indisponível!'})
         }
         if(email_existing){
-            res.status(409).json({'message': 'Email indisponível!'})
+            return res.status(409).json({'message': 'Email indisponível!'})
         }
         await User.create({username, email, cpf});
         return res.status(200).json({'message': 'Usuário cadastrado com sucesso'});
@@ -52,7 +52,7 @@ usersRouter.patch('/update_user/:id', async(req, res) => {
         const {username, email} = req.body;
         const user = await User.findByPk(id);
         if(!user){
-            res.status(404).json({'message': 'Usuário não encontrado!'});
+            return res.status(404).json({'message': 'Usuário não encontrado!'});
         }
 
         if(user.email !== email){
