@@ -26,7 +26,7 @@ usersRouter.get('/users', async(req, res) => {
 
 usersRouter.post('/register_user', async(req, res) => {
     try{
-        const {username, email, cpf} = req.body;
+        const {first_name, last_name, username, email, cpf, role} = req.body;
         const cpf_existing = await User.findOne({where: {cpf:cpf}});
         const email_existing = await User.findOne({where: {email:email}})
         if(cpf.length > 11){
@@ -38,7 +38,14 @@ usersRouter.post('/register_user', async(req, res) => {
         if(email_existing){
             return res.status(409).json({'message': 'Email indisponível!'})
         }
-        await User.create({username, email, cpf});
+        await User.create({
+            firstName: first_name,
+            lastName: last_name,
+            username: username,
+            email: email, 
+            cpf: cpf,
+            role: role
+        });
         return res.status(200).json({'message': 'Usuário cadastrado com sucesso'});
         }catch(error){
             console.log('Erro ao cadastrar usuário!', error);
