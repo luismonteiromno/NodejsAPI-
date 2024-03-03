@@ -11,6 +11,10 @@ const Stores = sequelize.define('Stores', {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
         allowNull: false
     },
+    employees: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
+        allowNull: false
+    },
     phone: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -26,7 +30,7 @@ const Stores = sequelize.define('Stores', {
     },
     delivery: {
         type: DataTypes.BOOLEAN,
-        default: false,
+        defaultValue: false,
     },
     minimum_delivery: {
         type: DataTypes.INTEGER,
@@ -42,5 +46,7 @@ const OwnersStores = sequelize.define('OwnersStores', {});
 
 Stores.belongsToMany(User, {through: OwnersStores});
 User.belongsToMany(Stores, {through: OwnersStores});
+
+Stores.hasMany(User, {});
 
 module.exports = Stores;

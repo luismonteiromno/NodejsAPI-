@@ -56,7 +56,7 @@ usersRouter.post('/register_user', async(req, res) => {
 usersRouter.patch('/update_user/:id', async(req, res) => {
     try{
         const {id} = req.params;
-        const {username, email} = req.body;
+        const {first_name, last_name, username, email, role} = req.body;
         const user = await User.findByPk(id);
         if(!user){
             return res.status(404).json({'message': 'Usuário não encontrado!'});
@@ -68,7 +68,13 @@ usersRouter.patch('/update_user/:id', async(req, res) => {
                 return res.status(409).json({ 'message': 'Este email já está sendo utilizado!' });
             }
         }
-        await user.update({username, email});
+        await user.update({
+            firstName: first_name,
+            lastName: last_name,
+            username: username, 
+            email: email,
+            role: role
+        });
         return res.status(200).json({'message': 'Usuário atualizado com sucesso'});      
     }catch(error){
         console.log('error', error);
