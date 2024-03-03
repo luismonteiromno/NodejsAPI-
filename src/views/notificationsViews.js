@@ -70,4 +70,14 @@ notificationsRouter.put('/read_notification/:id', async(req, res) => {
     }
 });
 
+notificationsRouter.get('/notifications_of_purchase', async(req, res) => {
+    try{
+        const notifications = await Notifications.findAll({where: {notification_purchase: true}});
+        return res.status(200).json({'message': 'Notificações encontradas', 'notifications': notifications});
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({'message': 'Erro ao listar notificações de compras'});
+    }
+})
+
 module.exports = notificationsRouter;
