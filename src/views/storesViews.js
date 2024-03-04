@@ -40,8 +40,9 @@ storesRouter.get('/store/:id', async(req, res) => {
 
 storesRouter.post('/register_store', async(req, res) => {
     try{
-        const {name, owners, employees, phone, street, number, delivery, minimum_delivery, maximum_delivery} = req.body;
+        const {logo, name, owners, employees, phone, street, number, delivery, minimum_delivery, maximum_delivery} = req.body;        
         const existingUsers = await User.findAll({ where: { id: owners } });
+        
         existingUsers.forEach(owner => {
             if(owner.dataValues.role !== 'owner'){
                 return res.status(400).json({'message': 'Algum(s) usuário(s) não é/são dono(s)'})
@@ -71,6 +72,7 @@ storesRouter.post('/register_store', async(req, res) => {
             res.status(400).json({'message': 'Preencha o campo de Delivery para validar os campos de tempo de entrega'})
         }
         await Stores.create({
+            logo: logo,
             name: name, 
             owners: owners, 
             employees: employees, 

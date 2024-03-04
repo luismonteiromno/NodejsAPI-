@@ -3,6 +3,10 @@ const User = require('./Users');
 const sequelize = require('../database/sequelize');
 
 const Stores = sequelize.define('Stores', {
+    logo: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false
