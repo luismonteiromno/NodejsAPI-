@@ -40,9 +40,9 @@ purchasesRouter.post('/register_purchase', async(req, res) => {
         await Purchases.create({products: products, userPurchase: userPurchase, StoreId: storeId});
         products.forEach(async(purchase) => {
             const product = await Products.findAll({where: {id:purchase}});
-            product.forEach(async(product_name)=>{
+            product.forEach(async(productName) => {
                 const title = 'Nova compra realizada!'
-                const message = `Produto ${product_name.dataValues.name} comprado`
+                const message = `Produto ${productName.dataValues.name} comprado`
                 await Notifications.create({
                     userId: userPurchase, 
                     title: title, 
